@@ -1,0 +1,11 @@
+{
+  "name":"Life Guard — تنبيهات الدواء",
+  "short_name":"Life Guard",
+  "lang":"ar",
+  "dir":"rtl",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#070b25",
+  "theme_color":"#080d2d",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
