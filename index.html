@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d2d">
+<link rel="manifest" href="manifest.json">
+<title>Life Guard — تنبيهات الدواء</title>
+<style>
+:root{--bg:#070b25;--card:#101743;--card2:#121a4d;--text:#fff;--muted:#aab2d5;--purple:#7b35ff;--pink:#ff4e93;--line:#28346f}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#202a78 0,#0a0f32 42%,#05071d 100%);color:var(--text);font-family:Arial,"Tahoma",sans-serif;min-height:100vh}
+.app{max-width:540px;margin:auto;min-height:100vh;padding:18px 16px 96px}
+header{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#6131ff,#28a6ff);display:grid;place-items:center;font-size:26px;box-shadow:0 8px 25px #24147d}
+h1{font-size:25px;margin:0}.brand b:last-child{color:#9a6cff}
+.bell{font-size:27px;position:relative}.dot{position:absolute;right:-1px;top:1px;width:9px;height:9px;background:#ff527f;border-radius:50%}
+.hero{padding:18px;border:1px solid #38469c;border-radius:22px;background:linear-gradient(110deg,#33127f,#153e91);box-shadow:0 12px 35px #03061b}
+.hero-title{font-size:19px;font-weight:700;margin-bottom:8px}.hero-sub{color:#d9dcf7;font-size:15px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:linear-gradient(160deg,#111a4b,#0b1138);border:1px solid #26366f;border-radius:20px;padding:16px;min-height:132px}
+.card .ico{font-size:32px}.label{font-size:16px;margin-top:8px;color:#e8eaff}.value{font-size:30px;font-weight:800;margin-top:8px}.small{font-size:13px;color:var(--muted);margin-top:5px}
+.section{margin-top:16px;background:linear-gradient(160deg,#111a4b,#0b1138);border:1px solid #26366f;border-radius:20px;padding:16px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.section h2{font-size:18px;margin:0}
+.btn{border:0;border-radius:14px;padding:13px 16px;color:white;font-weight:700;background:linear-gradient(90deg,#7437ff,#4b66ff);cursor:pointer;font-size:15px}
+.btn.secondary{background:#1a2458;border:1px solid #34427d}.btn.danger{background:#7d214c}
+.med{display:flex;align-items:center;gap:12px;padding:13px;background:#0b1238;border:1px solid #253466;border-radius:16px;margin-top:10px}
+.med-icon{width:45px;height:45px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#ff4d9a,#7337ff);font-size:23px}.med-info{flex:1}.med-name{font-weight:800;font-size:16px}.med-time{color:#bfc7e8;font-size:13px;margin-top:4px}.check{font-size:25px;cursor:pointer}
+.empty{text-align:center;color:var(--muted);padding:20px 8px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);padding:10px 16px 15px;background:rgba(6,9,30,.94);backdrop-filter:blur(15px);border-top:1px solid #26305e;display:flex;justify-content:space-around}
+.nav{color:#aab2d5;text-align:center;font-size:12px}.nav.active{color:#9a63ff;font-weight:800}.nav span{display:block;font-size:23px;margin-bottom:3px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:10}.modal.show{display:flex}.sheet{width:min(540px,100%);background:#0b1138;border:1px solid #35437d;border-radius:24px;padding:20px;box-shadow:0 20px 70px #000}
+input{width:100%;padding:14px;margin:7px 0 12px;border-radius:13px;border:1px solid #2c3a72;background:#0a1034;color:white;font-size:16px}label{font-size:14px;color:#cdd2eb}
+.actions{display:flex;gap:10px}.actions .btn{flex:1}
+.toast{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#171f54;border:1px solid #4a5a9d;padding:12px 18px;border-radius:14px;display:none;z-index:20}
+@media(min-width:700px){body{padding:15px}.app{border-radius:30px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">♡</div><h1>Life <b>Guard</b></h1></div>
+  <div class="bell">♧<i class="dot"></i></div>
+</header>
+
+<div class="hero">
+  <div class="hero-title">مساعدك الشخصي للدواء</div>
+  <div class="hero-sub">كل شيء تحت السيطرة .. صحتك تهمنا 💜</div>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="ico">💊</div><div class="label">أدوية اليوم</div><div class="value" id="todayCount">0</div><div class="small">جرعات مجدولة</div></div>
+  <div class="card"><div class="ico">⏰</div><div class="label">التنبيه القادم</div><div class="value" id="nextTime">—</div><div class="small" id="nextName">لا توجد جرعات</div></div>
+  <div class="card"><div class="ico">✓</div><div class="label">تم تناولها</div><div class="value" id="takenCount">0</div><div class="small">اليوم</div></div>
+  <div class="card"><div class="ico">🔔</div><div class="label">التنبيهات</div><div class="value" id="notifState">—</div><div class="small">حالة الإشعارات</div></div>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>💊 مواعيد الدواء</h2><button class="btn" onclick="openModal()">+ إضافة دواء</button></div>
+  <div id="medList"></div>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>🔔 التنبيهات</h2></div>
+  <p class="small">للحصول على تنبيه عند فتح التطبيق، فعّل الإشعارات. التطبيق يحفظ بيانات الأدوية على هذا الجهاز.</p>
+  <button class="btn secondary" onclick="enableNotifications()">تفعيل الإشعارات</button>
+</div>
+</div>
+
+<nav class="bottom">
+  <div class="nav active" onclick="showPage('home',this)"><span>⌂</span>الرئيسية</div>
+  <div class="nav" onclick="showPage('meds',this)"><span>💊</span>الأدوية</div>
+  <div class="nav" onclick="showPage('reports',this)"><span>▥</span>التقارير</div>
+  <div class="nav" onclick="showPage('settings',this)"><span>⚙</span>الإعدادات</div>
+</nav>
+
+
+<div id="pages" style="display:none">
+  <section id="page-meds" class="page section">
+    <div class="section-head"><h2>💊 الأدوية</h2><button class="btn" onclick="openModal()">+ إضافة دواء</button></div>
+    <p class="small">هنا ستجدين كل الأدوية ومواعيدها.</p>
+    <div id="allMeds"></div>
+  </section>
+
+  <section id="page-reports" class="page section">
+    <div class="section-head"><h2>📊 التقارير</h2></div>
+    <div class="grid" style="margin-top:0">
+      <div class="card"><div class="ico">💊</div><div class="label">إجمالي الأدوية</div><div class="value" id="reportTotal">0</div></div>
+      <div class="card"><div class="ico">✅</div><div class="label">تم تناولها اليوم</div><div class="value" id="reportTaken">0</div></div>
+    </div>
+    <div style="margin-top:15px;padding:15px;background:#0b1238;border-radius:16px">
+      <div style="font-weight:700;margin-bottom:8px">ملخص اليوم</div>
+      <div class="small" id="reportText">لا توجد أدوية مسجلة.</div>
+    </div>
+  </section>
+
+  <section id="page-settings" class="page section">
+    <div class="section-head"><h2>⚙ الإعدادات</h2></div>
+    <div class="med" onclick="enableNotifications()" style="cursor:pointer">
+      <div class="med-icon">🔔</div><div class="med-info"><div class="med-name">إشعارات الدواء</div><div class="med-time" id="settingsNotif">غير مفعّلة</div></div><div>›</div>
+    </div>
+    <div class="med" onclick="clearAllMeds()" style="cursor:pointer">
+      <div class="med-icon" style="background:#7d214c">🗑️</div><div class="med-info"><div class="med-name">مسح جميع الأدوية</div><div class="med-time">حذف البيانات المحفوظة على هذا الجهاز</div></div><div>›</div>
+    </div>
+    <div class="small" style="margin-top:18px;line-height:1.7">Life Guard<br>مساعد بسيط لتذكير كبار السن بمواعيد الدواء.</div>
+  </section>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2 style="margin-top:0">إضافة دواء جديد</h2>
+    <label>اسم الدواء</label><input id="name" placeholder="مثال: بانادول">
+    <label>وقت التنبيه</label><input id="time" type="time">
+    <label>الجرعة</label><input id="dose" placeholder="مثال: قرص واحد">
+    <div class="actions"><button class="btn secondary" onclick="closeModal()">إلغاء</button><button class="btn" onclick="saveMed()">حفظ الدواء</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="lifeguard_meds_v1";
+let meds=JSON.parse(localStorage.getItem(KEY)||"[]");
+let notified={};
+
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function save(){localStorage.setItem(KEY,JSON.stringify(meds))}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",2200)}
+function openModal(){document.getElementById("modal").classList.add("show");document.getElementById("name").focus()}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function saveMed(){
+  const name=document.getElementById("name").value.trim(),time=document.getElementById("time").value,dose=document.getElementById("dose").value.trim()||"حسب الوصفة";
+  if(!name||!time){toast("اكتب اسم الدواء والوقت");return}
+  meds.push({id:Date.now(),name,time,dose,takenDate:null});meds.sort((a,b)=>a.time.localeCompare(b.time));save();render();closeModal();toast("تمت إضافة الدواء ✓");
+}
+function toggleTaken(id){
+  const m=meds.find(x=>x.id===id); if(!m)return;
+  m.takenDate=m.takenDate===todayKey()?null:todayKey();save();render();toast(m.takenDate?"تم تسجيل الجرعة ✓":"تم إلغاء التسجيل");
+}
+function removeMed(id){if(confirm("حذف هذا الدواء؟")){meds=meds.filter(x=>x.id!==id);save();render()}}
+function render(){
+  const list=document.getElementById("medList");
+  document.getElementById("todayCount").textContent=meds.length;
+  document.getElementById("takenCount").textContent=meds.filter(m=>m.takenDate===todayKey()).length;
+  const now=new Date(), cur=now.getHours()*60+now.getMinutes();
+  const upcoming=meds.filter(m=>{const [h,n]=m.time.split(":").map(Number);return h*60+n>=cur})[0]||meds[0];
+  document.getElementById("nextTime").textContent=upcoming?upcoming.time:"—";
+  document.getElementById("nextName").textContent=upcoming?upcoming.name:"لا توجد جرعات";
+  if(!meds.length){list.innerHTML='<div class="empty">لا توجد أدوية بعد.<br>اضغط «إضافة دواء» للبدء.</div>';return}
+  list.innerHTML=meds.map(m=>`<div class="med">
+    <div class="med-icon">💊</div><div class="med-info"><div class="med-name">${esc(m.name)}</div><div class="med-time">${m.time} · ${esc(m.dose)}</div></div>
+    <div class="check" title="تسجيل الجرعة" onclick="toggleTaken(${m.id})">${m.takenDate===todayKey()?"✅":"◯"}</div>
+    <div onclick="removeMed(${m.id})" style="color:#ff79a9;cursor:pointer;font-size:18px">×</div>
+  </div>`).join("");
+  updateNotifState();
+  updateExtraPages();
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function enableNotifications(){
+  if(!("Notification" in window)){toast("هذا المتصفح لا يدعم الإشعارات");return}
+  const p=await Notification.requestPermission();
+  updateNotifState();toast(p==="granted"?"تم تفعيل الإشعارات ✓":"لم يتم السماح بالإشعارات");
+}
+function updateNotifState(){
+  document.getElementById("notifState").textContent=("Notification" in window&&Notification.permission==="granted")?"مفعّل":"غير مفعّل";
+}
+function checkReminders(){
+  const now=new Date(), key=now.toISOString().slice(0,10)+" "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  meds.forEach(m=>{
+    if(m.time===key.slice(11)&&!notified[m.id+key]){
+      notified[m.id+key]=1;
+      if("Notification" in window&&Notification.permission==="granted") new Notification("موعد الدواء 💊",{body:`حان وقت ${m.name} — ${m.dose}`,icon:"icon.svg"});
+      else toast(`💊 حان وقت ${m.name}`);
+    }
+  });
+}
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+function showPage(page, el){
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.querySelectorAll(".nav").forEach(n=>n.classList.remove("active"));
+  if(page==="home"){
+    document.querySelectorAll(".app > .section").forEach(s=>s.style.display="");
+    document.getElementById("pages").style.display="none";
+  }else{
+    document.querySelectorAll(".app > .section").forEach(s=>s.style.display="none");
+    document.getElementById("pages").style.display="block";
+    document.getElementById("page-"+page).style.display="block";
+    updateExtraPages();
+  }
+  if(el) el.classList.add("active");
+}
+function updateExtraPages(){
+  const all=document.getElementById("allMeds");
+  if(all){
+    all.innerHTML=meds.length?meds.map(m=>`<div class="med">
+      <div class="med-icon">💊</div><div class="med-info"><div class="med-name">${esc(m.name)}</div><div class="med-time">${m.time} · ${esc(m.dose)}</div></div>
+      <div class="check" onclick="toggleTaken(${m.id})">${m.takenDate===todayKey()?"✅":"◯"}</div>
+    </div>`).join(""):'<div class="empty">لا توجد أدوية مضافة.</div>';
+  }
+  const taken=meds.filter(m=>m.takenDate===todayKey()).length;
+  const total=document.getElementById("reportTotal"), rt=document.getElementById("reportTaken"), tx=document.getElementById("reportText");
+  if(total) total.textContent=meds.length;
+  if(rt) rt.textContent=taken;
+  if(tx) tx.textContent=meds.length?`تم تناول ${taken} من أصل ${meds.length} جرعة/دواء مسجل اليوم.`:"لا توجد أدوية مسجلة.";
+  const st=document.getElementById("settingsNotif");
+  if(st) st.textContent=("Notification" in window&&Notification.permission==="granted")?"مفعّلة ✓":"غير مفعّلة";
+}
+function clearAllMeds(){
+  if(confirm("هل تريدين حذف جميع الأدوية؟")){
+    meds=[]; save(); render(); updateExtraPages(); toast("تم حذف جميع الأدوية");
+  }
+}
+
+render();updateNotifState();setInterval(checkReminders,15000);
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+</script>
+</body>
+</html>
